@@ -144,3 +144,4 @@ if __name__ == '__main__':
     # print(delete_queue_attributes())
     # print(send_message_toqueue())
     print(send_batch_message_toqueue())
+    ljkjhjhh
