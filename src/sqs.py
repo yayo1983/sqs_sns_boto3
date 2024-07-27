@@ -129,7 +129,38 @@ def send_batch_message_toqueue():
                 'MessageBody': 'fourth message of batch'
             },
         ]
+    )
 
+def poll_queue_for_message():
+    return sqs_client().receive_message(
+        QueueUrl=Main_Queue_URL,
+        MaxNumberOfMessages=10
+    )
+
+def process_message_from_queue():
+    queue_messages = poll_queue_for_message()
+    if 'Messages' in queue_messages and len(queue_messages['Messages']) >= 1:
+        for message in queue_messages['Messages']:
+            print("processing message" + message['MessageId'] + " with text"+ message['Body'])
+            #delete_message_from_queue(message['ReceiptHandle'])
+            change_message_visibility_timeout(message['ReceiptHandle'])
+
+def delete_message_from_queue(receip_handle):
+    sqs_client().delete_message(
+        QueueUrl=Main_Queue_URL,
+        ReceiptHandle=receip_handle
+    )
+
+def change_message_visibility_timeout(receipt_handle):
+    sqs_client().change_message_visibility(
+        QueueUrl=Main_Queue_URL,
+        ReceiptHandle=receipt_handle,
+        VisibilityTimeout=5
+    )
+
+def purge_queue():
+    return sqs_client().purge_queue(
+        QueueUrl=Main_Queue_URL
     )
 
 if __name__ == '__main__':
@@ -143,5 +174,7 @@ if __name__ == '__main__':
     # print(update_queue_attributes())
     # print(delete_queue_attributes())
     # print(send_message_toqueue())
-    print(send_batch_message_toqueue())
-    ljkjhjhh
+    # print(send_batch_message_toqueue())
+    # print(poll_queue_for_message())
+    # print(process_message_from_queue())
+    print(purge_queue())
